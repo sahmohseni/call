@@ -106,9 +106,9 @@ class _DialPadState extends State<DialPad> {
           },
       child: Container(
           padding: const EdgeInsets.all(4.0),
-          margin: const EdgeInsets.all(8.0),
+          margin: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.0),
+              borderRadius: BorderRadius.circular(32.0),
               color: const Color.fromARGB(255, 243, 243, 240)),
           child: icon != null
               ? Icon(icon, size: 28, color: Colors.black87)

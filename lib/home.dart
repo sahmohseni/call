@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_switch/flutter_switch.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shomare_yab/background_task_handler.dart';
 import 'package:shomare_yab/dial_pad.dart';
+import 'package:shomare_yab/text_styles.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 
 @pragma('vm:entry-point')
@@ -37,27 +39,27 @@ Future<ServiceRequestResult> _startService() async {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool isPhonePermissionGranted = false;
+  bool showIncomingName = false;
   static const platform = MethodChannel('com.example.dialer/call');
   Future<void> checkPermissions() async {
     PermissionStatus phonePermissionStatus = await Permission.phone.status;
     PermissionStatus notifPermissionStatus =
         await Permission.notification.status;
-    PermissionStatus alertWindowPermissionStatus =
-        await Permission.notification.status;
 
     if (phonePermissionStatus.isGranted) {
-      if (notifPermissionStatus.isGranted) {
-        if (await FlutterForegroundTask.canDrawOverlays == true) {
+      if (await FlutterForegroundTask.canDrawOverlays == true) {
+        if (notifPermissionStatus.isGranted) {
           _initService();
           setState(() {
             isPhonePermissionGranted = phonePermissionStatus.isGranted;
+            showIncomingName = true;
           });
+          _startService();
         } else {
-          await FlutterForegroundTask.openSystemAlertWindowSettings();
+          _requestNotifPermission();
         }
-      }
-      {
-        _requestNotifPermission();
+      } else {
+        await FlutterForegroundTask.openSystemAlertWindowSettings();
       }
     } else {
       _requestPhonePermission();
@@ -79,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-    checkPermissions();
+    // checkPermissions();
     super.initState();
   }
 
@@ -126,31 +128,43 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("دسترسی مدیریت تماس"),
-                Text(isPhonePermissionGranted ? "فعال" : "غیر فعال")
+                Text(
+                  "نمایش نام تماس گیرنده",
+                  style: AppTextStyles.title.copyWith(color: Colors.black),
+                ),
+                SizedBox(
+                  width: 32.0,
+                ),
+                FlutterSwitch(
+                  width: 40.0,
+                  height: 20,
+                  toggleSize: 10.0,
+                  showOnOff: false,
+                  value: showIncomingName,
+                  onToggle: (value) {
+                    if (showIncomingName == true) {
+                      setState(() {
+                        showIncomingName == false;
+                      });
+                    } else {
+                      checkPermissions();
+                    }
+                  },
+                )
               ],
             ),
             SizedBox(
               height: 24,
             ),
-            ElevatedButton(onPressed: _startService, child: Text("start")),
-            ElevatedButton(
-                onPressed: () {
-                  SystemAlertWindow.showSystemWindow(
-                    height: 200,
-                    gravity: SystemWindowGravity.CENTER,
-                    prefMode: SystemWindowPrefMode.OVERLAY,
-                  );
-                },
-                child: Text("start")),
             DialPad(
               onCallPressed: (phoneNumber) async {
                 await platform
