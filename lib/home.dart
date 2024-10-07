@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shomare_yab/background_task_handler.dart';
+import 'package:shomare_yab/dial_pad.dart';
 
 @pragma('vm:entry-point')
 void startCallBack() {
@@ -34,7 +36,7 @@ Future<ServiceRequestResult> _startService() async {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool isPhonePermissionGranted = false;
-
+  static const platform = MethodChannel('com.example.dialer/call');
   Future<void> checkPermissions() async {
     PermissionStatus phonePermissionStatus = await Permission.phone.status;
     PermissionStatus notifPermissionStatus =
@@ -138,7 +140,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             SizedBox(
               height: 24,
             ),
-            ElevatedButton(onPressed: _startService, child: Text("start"))
+            ElevatedButton(onPressed: _startService, child: Text("start")),
+            DialPad(
+              onCallPressed: (phoneNumber) async {
+                await platform
+                    .invokeMethod('makeCall', {'number': phoneNumber});
+              },
+            )
           ],
         ),
       ),

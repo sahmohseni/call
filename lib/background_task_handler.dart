@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:phone_state/phone_state.dart';
+import 'package:shomare_yab/di.dart';
+import 'package:shomare_yab/storage.dart';
 
 class PhoneStateTaskHandler extends TaskHandler {
   @override
@@ -17,15 +19,15 @@ class PhoneStateTaskHandler extends TaskHandler {
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
+    appInjector();
     setStream();
   }
 }
 
 void setStream() {
   PhoneState.stream.listen((event) async {
-    print(event);
-    if (event.number != null) {
-      await FlutterOverlayWindow.shareData(event.number);
+    if (event.number != null && event.status.name == "CALL_INCOMING") {
+      await getIt<LocalDataBase>().savingIncominMobileNumber(event.number!);
       await FlutterOverlayWindow.showOverlay(
         enableDrag: true,
         overlayTitle: "X-SLAYER",
@@ -33,8 +35,6 @@ void setStream() {
         flag: OverlayFlag.defaultFlag,
         positionGravity: PositionGravity.auto,
         height: 300,
-        width: WindowSize.matchParent,
-        startPosition: const OverlayPosition(0, -259),
       );
     }
   });

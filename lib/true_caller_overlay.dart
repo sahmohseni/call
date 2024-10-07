@@ -3,6 +3,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:shomare_yab/storage.dart';
+import 'package:shomare_yab/text_styles.dart';
 
 class TrueCallerOverlay extends StatefulWidget {
   const TrueCallerOverlay({Key? key}) : super(key: key);
@@ -12,14 +14,7 @@ class TrueCallerOverlay extends StatefulWidget {
 }
 
 class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
-  Future<void> getDataFromOverLay() async {
-    FlutterOverlayWindow.overlayListener.listen((event) {
-      setState(() {
-        mobileNumber = event;
-      });
-    });
-  }
-
+  StreamSubscription? _sub;
   bool isGold = true;
   String mobileNumber = "";
   final _goldColors = const [
@@ -31,7 +26,7 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
   final _silverColors = const [
     Color(0xFFAEB2B8),
     Color(0xFFC7C9CB),
-    Color(0xFFD7D7D8),
+    Color.fromARGB(255, 53, 53, 56),
     Color(0xFFAEB2B8),
   ];
 
@@ -42,94 +37,46 @@ class _TrueCallerOverlayState extends State<TrueCallerOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Center(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Material(
+        color: Colors.transparent,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isGold ? _goldColors : _silverColors,
+            margin: const EdgeInsets.only(right: 24.0, left: 24.0),
+            padding: const EdgeInsets.all(16.0),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 9, 85, 146),
+              borderRadius: BorderRadius.circular(12.0),
             ),
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                isGold = !isGold;
-              });
-              FlutterOverlayWindow.getOverlayPosition().then((value) {
-                log("Overlay Position: $value");
-              });
-            },
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    ListTile(
-                      leading: Container(
-                        height: 80.0,
-                        width: 80.0,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black54),
-                          shape: BoxShape.circle,
-                          image: const DecorationImage(
-                            image: NetworkImage(
-                                "https://api.multiavatar.com/x-slayer.png"),
-                          ),
-                        ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "شماره تلفن کاربر",
+                        style: AppTextStyles.title,
                       ),
-                      title: Text(
+                      Text(
                         mobileNumber,
-                        style: const TextStyle(
-                            fontSize: 20.0, fontWeight: FontWeight.bold),
+                        style: AppTextStyles.title,
                       ),
-                      subtitle: const Text("Sousse , Tunisia"),
-                    ),
-                    const Spacer(),
-                    const Divider(color: Colors.black54),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("+216 21065826"),
-                              Text("Last call - 1 min ago"),
-                            ],
-                          ),
-                          Text(
-                            "Flutter Overlay",
-                            style: TextStyle(
-                                fontSize: 15.0, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: IconButton(
-                    onPressed: () async {
-                      await FlutterOverlayWindow.closeOverlay();
-                    },
-                    icon: const Icon(
-                      Icons.close,
-                      color: Colors.black,
-                    ),
+                      ValueListenableBuilder(
+                        valueListenable:
+                            LocalDataBase.incomingMobileNumberNotifier,
+                        builder: (context, value, child) {
+                          return Text(value);
+                        },
+                      )
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
+                ],
+              ),
+            )),
       ),
     );
   }
