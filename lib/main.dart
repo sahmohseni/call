@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:shomare_yab/custom_overlay.dart';
 import 'package:shomare_yab/di.dart';
 
 import 'package:shomare_yab/home.dart';
@@ -17,12 +18,22 @@ void main() async {
   runApp(const MyApp());
 }
 
+// @pragma("vm:entry-point")
+// void overlayMain() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   appInjector();
+//   runApp(const MaterialApp(
+//       debugShowCheckedModeBanner: false, home: TrueCallerOverlay()));
+// }
 @pragma("vm:entry-point")
-void overlayMain() async {
+void overlayMain() {
   WidgetsFlutterBinding.ensureInitialized();
-  appInjector();
-  runApp(const MaterialApp(
-      debugShowCheckedModeBanner: false, home: TrueCallerOverlay()));
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: CustomOverlay(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

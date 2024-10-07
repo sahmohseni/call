@@ -4,6 +4,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shomare_yab/background_task_handler.dart';
 import 'package:shomare_yab/dial_pad.dart';
+import 'package:system_alert_window/system_alert_window.dart';
 
 @pragma('vm:entry-point')
 void startCallBack() {
@@ -141,6 +142,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               height: 24,
             ),
             ElevatedButton(onPressed: _startService, child: Text("start")),
+            ElevatedButton(
+                onPressed: () {
+                  SystemAlertWindow.showSystemWindow(
+                    height: 200,
+                    gravity: SystemWindowGravity.CENTER,
+                    prefMode: SystemWindowPrefMode.OVERLAY,
+                  );
+                },
+                child: Text("start")),
             DialPad(
               onCallPressed: (phoneNumber) async {
                 await platform

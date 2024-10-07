@@ -42,6 +42,7 @@ dependencies:
   flutter_overlay_window: ^0.3.3
   shared_preferences: ^2.2.3
   get_it: ^8.0.0
+  system_alert_window: ^2.0.0
 
 dev_dependencies:
   flutter_test:
