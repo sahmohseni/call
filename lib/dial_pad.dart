@@ -3,6 +3,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shomare_yab/text_styles.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Callback type for when the call button is pressed.
 /// Provides the current phone number.
@@ -227,6 +229,14 @@ class _DialPadState extends State<DialPad> {
           _buildDisplay(),
           _buildDialPad(),
           _buildActionButtons(),
+          TextButton(
+              onPressed: () {
+                launch("https://uzee.ir/privacypolicyshomareyab");
+              },
+              child: Text(
+                "Privacy Policy",
+                style: AppTextStyles.title.copyWith(color: Colors.blue),
+              ))
         ],
       ),
     );
